@@ -1,7 +1,9 @@
 #include "GraphicsEngine2D.h"
+#include "Game.h"
 
 int main() {
-	GraphicsEngine2D graphicsEngine( glm::ivec2( 720, 360 ), "Snake pathfinding" );
+	GraphicsEngine2D graphicsEngine( glm::uvec2( 720, 360 ), "Snake pathfinding" );
+	Game game;
 
 	// Main game loop
 	while ( true ) {
@@ -12,7 +14,8 @@ int main() {
 			break;
 		}
 
-		graphicsEngine.Draw();
+		game.Update();
+		game.Draw( graphicsEngine );
 
 		graphicsEngine.Swap();
 	}

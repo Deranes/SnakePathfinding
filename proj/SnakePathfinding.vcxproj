@@ -124,11 +124,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Game.cpp" />
+    <ClCompile Include="..\src\GameState.cpp" />
     <ClCompile Include="..\src\GraphicsEngine2D.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\player\Human.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Game.h" />
+    <ClInclude Include="..\src\GameState.h" />
     <ClInclude Include="..\src\GraphicsEngine2D.h" />
+    <ClInclude Include="..\src\player\Human.h" />
+    <ClInclude Include="..\src\player\Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
