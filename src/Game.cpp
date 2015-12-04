@@ -63,7 +63,7 @@ void Game::Update() {
 			if ( !m_MainState->IsTileWalkable( movingTo ) ) {
 				m_DeadSnakes.push_back( snake );
 				team.Snakes.erase( team.Snakes.begin() + snakeIndex );
-				m_TeamDatas[snakeIndex].Moves.erase( m_TeamDatas[snakeIndex].Moves.begin() + snakeIndex );
+				m_TeamDatas[teamIndex].Moves.erase( m_TeamDatas[teamIndex].Moves.begin() + snakeIndex );
 				--snakeIndex;
 				continue;
 			}
