@@ -7,15 +7,19 @@
 #define GAME_BOARD_WIDTH			40
 #define GAME_BOARD_HEIGHT			30
 #define NR_OF_APPLES				5
-#define NR_OF_SNAKES_PER_TEAM		1
+#define NR_OF_SNAKES_PER_TEAM		8
 #define SNAKE_LENGTH				4
 #define SNAKE_GROWTH_PER_APPLE		3
 #define COLOUR_TEAM_1				glm::vec4( 0.0f, 1.0f, 0.0f, 1.0f )
+#define COLOUR_TEAM_2				glm::vec4( 0.0f, 0.0f, 1.0f, 1.0f )
+#define COLOUR_TEAM_3				glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f )
 #define COLOUR_APPLES				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
 
 Game::Game() {
 	// Create each team and decide how they are controlled (AI-method or Human).
-	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_1, new Human(), NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_1, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_2, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_3, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
 
 	// Create the initial game state.
 	m_MainState		= new GameState( glm::uvec2( GAME_BOARD_WIDTH, GAME_BOARD_HEIGHT ), m_TeamDatas.size(), NR_OF_SNAKES_PER_TEAM, SNAKE_LENGTH, NR_OF_APPLES );
