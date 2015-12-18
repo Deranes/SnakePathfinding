@@ -25,6 +25,9 @@
     <ClCompile Include="..\src\player\Human.cpp">
       <Filter>src\player</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\player\Boids.cpp">
+      <Filter>src\player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\GraphicsEngine2D.h">
@@ -40,6 +43,9 @@
       <Filter>src\player</Filter>
     </ClInclude>
     <ClInclude Include="..\src\player\Player.h">
+      <Filter>src\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\player\Boids.h">
       <Filter>src\player</Filter>
     </ClInclude>
   </ItemGroup>

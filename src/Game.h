@@ -28,7 +28,7 @@ public:
 
 private:
 	void						RemoveTail				( Snake& snake );
-	glm::ivec2					ConvertMoveToUVec2		( Move move );
+	glm::ivec2					ConvertMoveToIVec2		( Move move );
 
 	GameState*					m_MainState				= nullptr;
 	std::vector<TeamData>		m_TeamDatas;

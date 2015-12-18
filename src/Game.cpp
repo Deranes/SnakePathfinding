@@ -3,23 +3,28 @@
 #include <glm/geometric.hpp>
 #include "GraphicsEngine2D.h"
 #include "player/Human.h"
+#include "player/Boids.h"
 
-#define GAME_BOARD_WIDTH			40
-#define GAME_BOARD_HEIGHT			30
+#define GAME_BOARD_WIDTH			70
+#define GAME_BOARD_HEIGHT			50
 #define NR_OF_APPLES				5
-#define NR_OF_SNAKES_PER_TEAM		8
+#define NR_OF_SNAKES_PER_TEAM		16
 #define SNAKE_LENGTH				4
 #define SNAKE_GROWTH_PER_APPLE		3
 #define COLOUR_TEAM_1				glm::vec4( 0.0f, 1.0f, 0.0f, 1.0f )
 #define COLOUR_TEAM_2				glm::vec4( 0.0f, 0.0f, 1.0f, 1.0f )
 #define COLOUR_TEAM_3				glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f )
+#define COLOUR_TEAM_4				glm::vec4( 1.0f, 0.0f, 1.0f, 1.0f )
+#define COLOUR_TEAM_5				glm::vec4( 0.0f, 1.0f, 1.0f, 1.0f )
+#define COLOUR_TEAM_6				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
 #define COLOUR_APPLES				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
 
 Game::Game() {
 	// Create each team and decide how they are controlled (AI-method or Human).
-	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_1, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
-	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_2, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
-	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_3, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_1, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_2, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_3, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_4, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
 
 	// Create the initial game state.
 	m_MainState		= new GameState( glm::uvec2( GAME_BOARD_WIDTH, GAME_BOARD_HEIGHT ), m_TeamDatas.size(), NR_OF_SNAKES_PER_TEAM, SNAKE_LENGTH, NR_OF_APPLES );
@@ -32,6 +37,9 @@ Game::~Game() {
 void Game::Update() {
 	// Get moves from all the players.
 	for ( size_t teamIndex = 0; teamIndex < m_TeamDatas.size(); ++teamIndex ) {
+		if ( m_MainState->Teams[teamIndex].Snakes.empty() ) {		// Check if team is dead.
+			continue;		// Skip dead team.
+		}
 		m_TeamDatas[teamIndex].Player->MakeMoves( *m_MainState, teamIndex, m_TeamDatas[teamIndex].Moves );
 	}
 
@@ -61,7 +69,7 @@ void Game::Update() {
 		for ( size_t snakeIndex = 0; snakeIndex < team.Snakes.size(); ++snakeIndex ) {
 			Snake& snake					= team.Snakes[snakeIndex];
 			const Move move					= m_TeamDatas[teamIndex].Moves[snakeIndex];
-			const glm::ivec2 movingTo		= *snake.Segments.begin() + ConvertMoveToUVec2( move );
+			const glm::ivec2 movingTo		= *snake.Segments.begin() + ConvertMoveToIVec2( move );
 
 			// Kill snake if it tries to move onto an unwalkable tile.
 			if ( !m_MainState->IsTileWalkable( movingTo ) ) {
@@ -148,7 +156,7 @@ void Game::RemoveTail( Snake& snake ) {
 	snake.Segments.pop_back();																	// Remove the tail of the snake.
 }
 
-glm::ivec2 Game::ConvertMoveToUVec2( Move move ) {
+glm::ivec2 Game::ConvertMoveToIVec2( Move move ) {
 	if ( move == Move::Left ) {
 		return glm::ivec2( -1,  0 );
 	} else if ( move == Move::Right ) {

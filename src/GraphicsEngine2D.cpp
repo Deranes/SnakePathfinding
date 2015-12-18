@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 GraphicsEngine2D::GraphicsEngine2D( const glm::uvec2& windowSize, const std::string& windowTitle ) {
-	m_Window			= new sf::RenderWindow( sf::VideoMode( windowSize.x, windowSize.y ), windowTitle );
+	m_Window			= new sf::RenderWindow( sf::VideoMode( windowSize.x, windowSize.y ), windowTitle, sf::Style::Fullscreen );
 	m_Circle			= new sf::CircleShape();
 	m_Rectangle			= new sf::RectangleShape();
 }

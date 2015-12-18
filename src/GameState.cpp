@@ -31,8 +31,8 @@ GameState::GameState( const glm::uvec2& size, size_t nrOfTeams, size_t snakesPer
 		for ( size_t snakeIndex = 0; snakeIndex < team.Snakes.size(); ++snakeIndex ) {
 			Snake& snake										= team.Snakes[snakeIndex];
 			snake.SegmentsToSpawn								= snakeLength - 1;									// Only the snakes head is on the board at the start, rest of the body gets spawned later.
-			const glm::ivec2 spawnPosition						= glm::ivec2(	5 + snakeIndex * snakeLength,		// Arbitrary spawn position.					// TODO: Remove magic numbers.
-																				5 + teamIndex * snakeLength );					
+			const glm::ivec2 spawnPosition						= glm::ivec2(	5 + snakeIndex * 3,					// Arbitrary spawn position.					// TODO: Revamp spawn positions.
+																				5 + teamIndex * 10 );					
 			this->Board[spawnPosition.y][spawnPosition.x]		= Tile::Blocked;									// Block the snakes position in the board.
 			snake.Segments.push_back( spawnPosition );
 		}
