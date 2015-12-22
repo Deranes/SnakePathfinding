@@ -153,16 +153,3 @@ void Game::RemoveTail( Snake& snake ) {
 	m_MainState->Board[tailPosition.y][tailPosition.x]		= Tile::Open;						// Mark the tails position as free.
 	snake.Segments.pop_back();																	// Remove the tail of the snake.
 }
-
-glm::ivec2 Game::ConvertMoveToIVec2( Move move ) {
-	if ( move == Move::Left ) {
-		return glm::ivec2( -1,  0 );
-	} else if ( move == Move::Right ) {
-		return glm::ivec2(  1,  0 );
-	} else if ( move == Move::Up ) {
-		return glm::ivec2(  0, -1 );
-	} else if ( move == Move::Down ) {
-		return glm::ivec2(  0,  1 );
-	}
-	return glm::ivec2( 0 );
-}

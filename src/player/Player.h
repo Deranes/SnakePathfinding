@@ -1,14 +1,8 @@
 #pragma once
 
 #include <vector>
+#include "Move.h"
 #include "../GameState.h"
-
-enum class Move {
-	Up,
-	Left,
-	Down,
-	Right
-};
 
 class Player {
 public:
