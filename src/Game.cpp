@@ -32,6 +32,9 @@ Game::~Game() {
 void Game::Update() {
 	// Get moves from all the players.
 	for ( size_t teamIndex = 0; teamIndex < m_TeamDatas.size(); ++teamIndex ) {
+		if ( m_MainState->Teams[teamIndex].Snakes.empty() ) {		// Check if team is dead.
+			continue;		// Skip dead team.
+		}
 		m_TeamDatas[teamIndex].Player->MakeMoves( *m_MainState, teamIndex, m_TeamDatas[teamIndex].Moves );
 	}
 
