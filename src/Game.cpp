@@ -4,15 +4,18 @@
 #include "GraphicsEngine2D.h"
 #include "player/Human.h"
 
-#define GAME_BOARD_WIDTH			40
-#define GAME_BOARD_HEIGHT			30
+#define GAME_BOARD_WIDTH			70
+#define GAME_BOARD_HEIGHT			50
 #define NR_OF_APPLES				5
-#define NR_OF_SNAKES_PER_TEAM		8
+#define NR_OF_SNAKES_PER_TEAM		16
 #define SNAKE_LENGTH				4
 #define SNAKE_GROWTH_PER_APPLE		3
 #define COLOUR_TEAM_1				glm::vec4( 0.0f, 1.0f, 0.0f, 1.0f )
 #define COLOUR_TEAM_2				glm::vec4( 0.0f, 0.0f, 1.0f, 1.0f )
 #define COLOUR_TEAM_3				glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f )
+#define COLOUR_TEAM_4				glm::vec4( 1.0f, 0.0f, 1.0f, 1.0f )
+#define COLOUR_TEAM_5				glm::vec4( 0.0f, 1.0f, 1.0f, 1.0f )
+#define COLOUR_TEAM_6				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
 #define COLOUR_APPLES				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
 
 Game::Game() {
