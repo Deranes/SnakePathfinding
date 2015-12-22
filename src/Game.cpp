@@ -61,7 +61,7 @@ void Game::Update() {
 		for ( size_t snakeIndex = 0; snakeIndex < team.Snakes.size(); ++snakeIndex ) {
 			Snake& snake					= team.Snakes[snakeIndex];
 			const Move move					= m_TeamDatas[teamIndex].Moves[snakeIndex];
-			const glm::ivec2 movingTo		= *snake.Segments.begin() + ConvertMoveToUVec2( move );
+			const glm::ivec2 movingTo		= *snake.Segments.begin() + ConvertMoveToIVec2( move );
 
 			// Kill snake if it tries to move onto an unwalkable tile.
 			if ( !m_MainState->IsTileWalkable( movingTo ) ) {
@@ -148,7 +148,7 @@ void Game::RemoveTail( Snake& snake ) {
 	snake.Segments.pop_back();																	// Remove the tail of the snake.
 }
 
-glm::ivec2 Game::ConvertMoveToUVec2( Move move ) {
+glm::ivec2 Game::ConvertMoveToIVec2( Move move ) {
 	if ( move == Move::Left ) {
 		return glm::ivec2( -1,  0 );
 	} else if ( move == Move::Right ) {
