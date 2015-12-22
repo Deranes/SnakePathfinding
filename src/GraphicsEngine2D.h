@@ -14,7 +14,7 @@ namespace sf {
 
 class GraphicsEngine2D {
 public:
-								GraphicsEngine2D			( const glm::uvec2& windowSize, const std::string& windowTitle );
+								GraphicsEngine2D			( const glm::uvec2& windowSize, const std::string& windowTitle, bool fullscreen );
 								~GraphicsEngine2D			( );
 
 	void						Clear						( );

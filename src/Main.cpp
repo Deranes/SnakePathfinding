@@ -6,12 +6,13 @@
 
 #define WINDOW_RESOLUTION_WIDTH			720
 #define WINDOW_RESOLUTION_HEIGHT		360
+#define WINDOW_FULLSCREEN				false
 #define WINDOW_TITLE					"Snake pathfinding"
 #define KEY_GAME_EXIT					sf::Keyboard::Key::Escape
 #define KEY_GAME_RESET					sf::Keyboard::Key::R
 
 int main() {
-	GraphicsEngine2D graphicsEngine( glm::uvec2( WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT ), WINDOW_TITLE );
+	GraphicsEngine2D graphicsEngine( glm::uvec2( WINDOW_RESOLUTION_WIDTH, WINDOW_RESOLUTION_HEIGHT ), WINDOW_TITLE, WINDOW_FULLSCREEN );
 	Game game;
 
 	// Main game loop
