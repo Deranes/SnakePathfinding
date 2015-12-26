@@ -4,9 +4,9 @@
 #include "Game.h"
 #include "GraphicsEngine2D.h"
 
-#define WINDOW_RESOLUTION_WIDTH			720
-#define WINDOW_RESOLUTION_HEIGHT		360
 #define WINDOW_FULLSCREEN				false
+#define WINDOW_RESOLUTION_WIDTH			1100	
+#define WINDOW_RESOLUTION_HEIGHT		600
 #define WINDOW_TITLE					"Snake pathfinding"
 #define KEY_GAME_EXIT					sf::Keyboard::Key::Escape
 #define KEY_GAME_RESET					sf::Keyboard::Key::R
@@ -33,7 +33,7 @@ int main() {
 		game.Draw( graphicsEngine );
 
 		// Slow down the game so that it is possible to see what is going on.
-		std::this_thread::sleep_for( std::chrono::milliseconds( 85 ) );		// TODO: Sleep shorter if the frame is longer.
+		std::this_thread::sleep_for( std::chrono::milliseconds( 70 ) );		// TODO: Sleep shorter if the frame is longer.
 
 		graphicsEngine.Swap();
 	}
