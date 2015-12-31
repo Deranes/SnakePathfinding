@@ -25,6 +25,9 @@
     <ClCompile Include="..\src\player\Human.cpp">
       <Filter>src\player</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\player\Boids.cpp">
+      <Filter>src\player</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\player\Move.cpp">
       <Filter>src\player</Filter>
     </ClCompile>
@@ -43,6 +46,9 @@
       <Filter>src\player</Filter>
     </ClInclude>
     <ClInclude Include="..\src\player\Player.h">
+      <Filter>src\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\player\Boids.h">
       <Filter>src\player</Filter>
     </ClInclude>
     <ClInclude Include="..\src\player\Move.h">

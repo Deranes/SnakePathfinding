@@ -3,6 +3,7 @@
 #include <glm/geometric.hpp>
 #include "GraphicsEngine2D.h"
 #include "player/Human.h"
+#include "player/Boids.h"
 
 #define GAME_BOARD_WIDTH			70
 #define GAME_BOARD_HEIGHT			50
@@ -20,9 +21,10 @@
 
 Game::Game() {
 	// Create each team and decide how they are controlled (AI-method or Human).
-	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_1, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
-	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_2, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
-	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_3, new Human(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_1, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_2, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_3, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
+	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_4, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
 
 	// Create the initial game state.
 	m_MainState		= new GameState( glm::uvec2( GAME_BOARD_WIDTH, GAME_BOARD_HEIGHT ), m_TeamDatas.size(), NR_OF_SNAKES_PER_TEAM, SNAKE_LENGTH, NR_OF_APPLES );

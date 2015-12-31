@@ -26,6 +26,9 @@ public:
 	void								SpawnApple			( glm::ivec2& apple );
 
 	bool								IsTileWalkable		( const glm::ivec2& tile ) const;
+
+										// Undefined behaviour if no apples exist.
+	glm::ivec2							FindClosestApple	( const glm::vec2& position ) const;
 										
 	glm::uvec2							Size;				// Size of the game board.
 	std::vector<std::vector<Tile>>		Board;				// Shows the state of each tile on the game board.

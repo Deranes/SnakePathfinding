@@ -1,5 +1,7 @@
 #include "GameState.h"
 
+#include <glm/geometric.hpp>
+
 #define SNAKE_LENGTH_MINIMUM		2		// Minimum snake length is set to the lowest number that doesn't cause the game to crash.
 
 GameState::GameState( const glm::uvec2& size, size_t nrOfTeams, size_t snakesPerTeam, size_t snakeLength, size_t nrOfApples ) {
@@ -60,4 +62,22 @@ bool GameState::IsTileWalkable( const glm::ivec2& tile ) const {
 		return false;
 	}
 	return this->Board[tile.y][tile.x] != Tile::Blocked;		// Check if destination tile is blocked.
+}
+
+glm::ivec2 GameState::FindClosestApple( const glm::vec2& position ) const {
+	glm::ivec2 closestApple			= position;		// Arbitrary initial value, will be overwritten if any apples exist.
+	float closestDistanceSqrd		= FLT_MAX;		// Initial value chosen so that the first apple will overwrite it.
+
+	for ( const auto& apple : this->Apples ) {
+		// Calculate distance (squared) to the apple.
+		const glm::vec2 vectorToApple		= glm::vec2( apple ) - position;
+		const float distanceToAppleSqrd		= glm::dot( vectorToApple, vectorToApple );
+
+		// Save information about the apple if it is closer than the previously closest apple.
+		if ( distanceToAppleSqrd < closestDistanceSqrd ) {
+			closestDistanceSqrd		= distanceToAppleSqrd;
+			closestApple			= apple;
+		}
+	}
+	return closestApple;
 }
