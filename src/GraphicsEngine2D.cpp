@@ -54,6 +54,10 @@ glm::uvec2 GraphicsEngine2D::GetWindowsSize() const {
 	return glm::uvec2( m_Window->getSize().x, m_Window->getSize().y );
 }
 
+sf::Window* GraphicsEngine2D::GetWindowHandle( ) const {
+	return m_Window;
+}
+
 sf::Color GraphicsEngine2D::ConvertVec4ToColor( const glm::vec4& colour ) const {
 	return sf::Color(	static_cast<sf::Uint8>( 255 * colour.r ),
 						static_cast<sf::Uint8>( 255 * colour.g ),

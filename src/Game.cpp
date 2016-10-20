@@ -1,7 +1,9 @@
 #include "Game.h"
 
-#include <glm/geometric.hpp>
 #include "GraphicsEngine2D.h"
+
+#ifdef SNAKE
+#include <glm/geometric.hpp>
 #include "player/Human.h"
 #include "player/Boids.h"
 
@@ -18,8 +20,15 @@
 #define COLOUR_TEAM_5				glm::vec4( 0.0f, 1.0f, 1.0f, 1.0f )
 #define COLOUR_TEAM_6				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
 #define COLOUR_APPLES				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
+#else
+#include <algorithm>
+#include <vector>
+#include <SFML/Window/Mouse.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#endif
 
 Game::Game() {
+#ifdef SNAKE
 	// Create each team and decide how they are controlled (AI-method or Human).
 	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_1, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
 	m_TeamDatas.push_back( TeamData( COLOUR_TEAM_2, new Boids(),		NR_OF_SNAKES_PER_TEAM ) );
@@ -28,13 +37,21 @@ Game::Game() {
 
 	// Create the initial game state.
 	m_MainState		= new GameState( glm::uvec2( GAME_BOARD_WIDTH, GAME_BOARD_HEIGHT ), m_TeamDatas.size(), NR_OF_SNAKES_PER_TEAM, SNAKE_LENGTH, NR_OF_APPLES );
+#else
+
+#endif
 }
 
 Game::~Game() {
+#ifdef SNAKE
 	if ( m_MainState		) { delete m_MainState;		m_MainState		= nullptr; }
+#else
+
+#endif
 }
 
 void Game::Update() {
+#ifdef SNAKE
 	// Get moves from all the players.
 	for ( size_t teamIndex = 0; teamIndex < m_TeamDatas.size(); ++teamIndex ) {
 		if ( m_MainState->Teams[teamIndex].Snakes.empty() ) {		// Check if team is dead.
@@ -97,9 +114,13 @@ void Game::Update() {
 			m_MainState->Board[movingTo.y][movingTo.x]		= Tile::Blocked;		// Mark the heads new position as blocked.
 		}
 	}
+#else
+
+#endif
 }
 
 void Game::Draw( GraphicsEngine2D& graphicsEngine ) {
+#ifdef SNAKE
 	// Calculate screen location of the playable area.
 	const glm::vec2 windowSize					= glm::vec2( graphicsEngine.GetWindowsSize() );
 	const glm::vec2 scale						= glm::vec2( glm::min( windowSize.x / m_MainState->Size.x, windowSize.y / m_MainState->Size.y ) );
@@ -139,8 +160,168 @@ void Game::Draw( GraphicsEngine2D& graphicsEngine ) {
 		const glm::vec2 applePosition		= playableAreaPosition + scale * ( glm::vec2( apple ) );
 		graphicsEngine.DrawCircle( applePosition, 0.5f * scale.x, COLOUR_APPLES );
 	}
+#else
+	auto windowSize = graphicsEngine.GetWindowsSize();
+	const glm::vec2 graphAreaSize			= 0.7f * glm::vec2( windowSize );
+	const glm::vec2 graphAreaPosition		= 0.5f * ( glm::vec2( graphicsEngine.GetWindowsSize() ) - graphAreaSize );
+
+	struct Range
+	{
+		int Min;
+		int Max;
+
+		Range( int min, int max ) : Min(min), Max(max) {};
+	};
+
+	std::vector<Range> ranges;
+	ranges.push_back( Range( 0, 3 ) );
+	ranges.push_back( Range( 0, 99 ) );
+	ranges.push_back( Range( 7, 23 ) );
+	ranges.push_back( Range( 13, 43 ) );
+
+	int minVal = 0;
+	int maxVal = 0;
+	int totalWays = 1.0f;
+
+	for ( auto& range : ranges )
+	{
+		minVal += range.Min;
+		maxVal += range.Max;
+		totalWays *= 1 + range.Max - range.Min;
+	}
+
+	std::vector<int> ways( 1 + maxVal - minVal );
+	for ( auto& way : ways )
+	{
+		way = 0;
+	}
+
+	std::vector<int> values;
+	for ( auto& range : ranges )
+	{
+		values.push_back( range.Min );
+	}
+
+	bool continueLoop = true;
+	while( continueLoop )
+	{
+		int total = 0;
+		for ( auto& value : values )
+		{
+			total += value;
+		}
+
+		++ways[ total - minVal ];
+
+		for ( int i = 0; i < values.size(); ++i )
+		{
+			++values[i];
+			if ( values[i] > ranges[i].Max )
+			{
+				values[i] = ranges[i].Min;
+			}
+			else
+			{
+				break;
+			}
+
+			if ( i + 1 == values.size() )
+			{
+				continueLoop = false;
+			}
+		}
+	}
+
+	// Draw background for where the graph is allowed
+	graphicsEngine.DrawRectangle( graphAreaPosition, graphAreaSize );
+
+	int highestWay = 0;
+	for ( auto& way : ways )
+	{
+		if ( way > highestWay )
+		{
+			highestWay = way;
+		}
+	}
+
+	float barWidth = graphAreaSize.x / ways.size();
+	float barYScale = 0.7f * graphAreaSize.y / highestWay;
+
+	for ( int i = 0; i < ways.size(); ++i )
+	{
+		glm::vec2 barSize( barWidth, ways[i] * barYScale );
+		graphicsEngine.DrawRectangle( graphAreaPosition + glm::vec2( i * barWidth, graphAreaSize.y - barSize.y ), barSize, glm::vec4( 1, 0, 0, 1 ) );
+	}
+
+	//static float prevHighest	= 1.0f;
+	//float currentHighest		= 0.0f;
+
+	//const int barWidth = 2;
+
+	//sf::Vector2i sfMousePos		= sf::Mouse::getPosition( *graphicsEngine.GetWindowHandle() );
+	//glm::vec2 mousePos			= glm::vec2( sfMousePos.x, sfMousePos.y );
+	//bool useMouse				= mousePos.x >= graphAreaPosition.x && mousePos.y > graphAreaPosition.y && mousePos.x <= graphAreaPosition.x + graphAreaSize.x && mousePos.y <= graphAreaPosition.y + graphAreaSize.y;
+	//float mouseFuncX			= mousePos.x - graphAreaPosition.x;
+
+	//static int nrOfCurves = 1;
+
+	//if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Num0 ) ) {
+	//	nrOfCurves = 0;
+	//} else if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Num1 ) ) {
+	//	nrOfCurves = 1;
+	//} else if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Num2 ) ) {
+	//	nrOfCurves = 2;
+	//} else if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Num3 ) ) {
+	//	nrOfCurves = 3;
+	//};
+
+	//static bool prevClicked = false;
+	//bool thisClicked = sf::Mouse::isButtonPressed( sf::Mouse::Left );
+
+	//if ( !prevClicked && thisClicked ) {		
+	//	nrOfCurves = fminf( 3, nrOfCurves + 1 );
+
+	//	if ( nrOfCurves == 1 ) {
+	//		midPoint1 = mouseFuncX;
+	//	} else if ( nrOfCurves == 2 ) {
+	//		midPoint2 = mouseFuncX;
+	//	} else if ( nrOfCurves == 3 ) {
+	//		midPoint3 = mouseFuncX;
+	//	}
+	//}
+
+	//prevClicked = thisClicked;
+
+	//for ( int x = 0; x < graphAreaSize.x; x += barWidth ) {
+	//	float coolFuncVal	= this->CoolFunction( nrOfCurves, x + 0.5f * barWidth );
+	//	glm::vec2 barSize = glm::vec2( barWidth, graphAreaSize.y / prevHighest * coolFuncVal );
+	//	graphicsEngine.DrawRectangle( graphAreaPosition + glm::vec2( x, graphAreaSize.y - barSize.y ), barSize, glm::vec4( 1, 0, 0, 1 ) );
+	//	
+	//	if ( useMouse ) {
+	//		coolFuncVal		= this->CoolFunction( nrOfCurves, x + 0.5f * barWidth, useMouse, mouseFuncX );
+	//		glm::vec2 barSize = glm::vec2( barWidth, graphAreaSize.y / prevHighest * coolFuncVal );
+	//		graphicsEngine.DrawRectangle( graphAreaPosition + glm::vec2( x, graphAreaSize.y - barSize.y ), barSize, glm::vec4( 0, 1, 0, 0.5f ) );
+	//	}
+
+	//	if ( coolFuncVal > currentHighest ) {
+	//		currentHighest = coolFuncVal;
+	//	}
+	//}
+
+	//const float scale = 2.5f;
+	//if ( prevHighest == 1.0f ) {
+	//	prevHighest = scale * currentHighest;
+	//} else if ( currentHighest > prevHighest || currentHighest < 0.1f * prevHighest ) {
+	//	const float p = 0.7f;
+	//	prevHighest = (1.0f-p) * prevHighest + p * ( scale * currentHighest );
+	//}
+	//if ( prevHighest > 0.1f ) {
+	//	prevHighest = 0.1f;
+	//}
+#endif
 }
 
+#ifdef SNAKE
 void Game::RemoveTail( Snake& snake ) {
 	if ( snake.SegmentsToSpawn > 0 ) {		// Don't remove tail of snake if there are segments left to spawn (e.g after eating).
 		--snake.SegmentsToSpawn;
@@ -155,3 +336,81 @@ void Game::RemoveTail( Snake& snake ) {
 	m_MainState->Board[tailPosition.y][tailPosition.x]		= Tile::Open;						// Mark the tails position as free.
 	snake.Segments.pop_back();																	// Remove the tail of the snake.
 }
+#else
+float Game::CoolFunction( int nrOfCurves, float x, bool useMouse, float mouseX ) {
+	auto normal_dist = []( float x, float centerX, float halfRange ) -> float {
+		if ( x < centerX - halfRange || x > centerX + halfRange ) {
+			return 0.0f;
+		}
+
+		const float e				= 2.71828f;
+		const float inner_x			= 2.0f * ( x - centerX )  / halfRange;
+		const float inner_x_sqrd	= inner_x * inner_x;
+		const float e_power			= -0.5f * inner_x_sqrd;
+		const float dividend		= powf( e, e_power );
+		const float devisor			= halfRange * 1.196288344f; // 0.47725 * sqrt( 2 * pi)
+
+		float answer				= dividend / devisor;
+		return answer;
+	};
+
+	auto integrate_normal_dist = []( float lowBound, float highBound, float centerX, float halfRange ) -> float {
+		if ( highBound <= lowBound ) {
+			return 0.0f;
+		}
+		const float sqrt_2		= 1.41421356237f;
+		const float a			= erff( sqrt_2 * ( highBound - centerX ) / halfRange );
+		const float b			= erff( sqrt_2 * ( lowBound - centerX ) / halfRange );
+		return 0.523834f * ( a - b );
+	};
+
+	auto addDist = []( float x_old, float x_new ) -> float {
+		float p = 0.4f;
+		return x_new < 0.0001f ? 0.0f : p * x_old + (1.0f - p) * x_new;
+	};
+
+	float range			= 400.0f;
+	float ans			= 0.0f;
+	float factor		= 1.0f;
+
+	if ( nrOfCurves > 0 ) {
+		factor = 1.0f;
+		range /= 2.0f;
+		if ( nrOfCurves > 1  ) {
+			factor = integrate_normal_dist( fmaxf( midPoint1 - range, midPoint2 - range / 2.0f ), fminf( midPoint1 + range, midPoint2 + range / 2.0f ), midPoint1, range );
+		} else if ( useMouse ) {
+			factor = integrate_normal_dist( fmaxf( midPoint1 - range, mouseX - range / 2.0f ), fminf( midPoint1 + range, mouseX + range / 2.0f ), midPoint1, range );
+		}
+		if ( factor > 0.0f ) {
+			ans = addDist( ans, normal_dist( x, midPoint1, range  ) / factor );
+		}
+		if ( nrOfCurves > 1 ) {
+			factor = 1.0f;
+			range /= 2.0f;
+			if ( nrOfCurves > 2  ) {
+				factor = integrate_normal_dist( fmaxf( midPoint2 - range, midPoint3 - range / 2.0f ), fminf( midPoint2 + range, midPoint3 + range / 2.0f ), midPoint2, range );
+			} else if ( useMouse ) {
+				factor = integrate_normal_dist( fmaxf( midPoint2 - range, mouseX - range / 2.0f ), fminf( midPoint2 + range, mouseX + range / 2.0f ), midPoint2, range );
+			}
+			if ( factor > 0.0f ) {
+				ans = addDist( ans, normal_dist( x, midPoint2, range ) / factor );
+			}
+			if ( nrOfCurves > 2 ) {
+				factor = 1.0f;
+				range /= 2.0f;
+				if ( useMouse ) {
+					factor = integrate_normal_dist( fmaxf( midPoint3 - range, mouseX - range / 2.0f ), fminf( midPoint3 + range, mouseX + range / 2.0f ), midPoint3, range );
+				}
+				ans = addDist( ans, normal_dist( x, midPoint3, range ) / factor );
+			}
+		}
+	}
+
+	if ( !useMouse ) {
+		return ans;
+	}
+
+	return addDist( ans, normal_dist( x, mouseX, range /= 2.0f ) );
+}
+
+#endif

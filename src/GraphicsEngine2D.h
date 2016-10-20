@@ -6,6 +6,7 @@
 
 // Pre-declerations of sfml classes to avoid exposing sfml headers to users of this class.
 namespace sf {
+	class Window;
 	class RenderWindow;
 	class Color;
 	class CircleShape;
@@ -24,6 +25,7 @@ public:
 	void						DrawRectangle				( const glm::vec2& position, const glm::vec2& size,	const glm::vec4& colour = glm::vec4( 1.0f ) );
 	bool						IsWindowOpen				( ) const;
 	glm::uvec2					GetWindowsSize				( ) const;
+	sf::Window*					GetWindowHandle				( ) const;
 
 private:
 	sf::Color					ConvertVec4ToColor			( const glm::vec4& colour ) const;
