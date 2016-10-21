@@ -22,6 +22,7 @@
 #define COLOUR_APPLES				glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f )
 #else
 #include <algorithm>
+#include <iostream>
 #include <vector>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -174,74 +175,88 @@ void Game::Draw( GraphicsEngine2D& graphicsEngine ) {
 	};
 
 	std::vector<Range> ranges;
-	ranges.push_back( Range( 0, 3 ) );
-	ranges.push_back( Range( 0, 99 ) );
-	ranges.push_back( Range( 7, 23 ) );
-	ranges.push_back( Range( 13, 43 ) );
+	ranges.push_back( Range( 0, 8 ) );
+	ranges.push_back( Range( 4, 16 ) );
+	ranges.push_back( Range( 8, 32 ) );
+	ranges.push_back( Range( 16, 64 ) );
+	ranges.push_back( Range( 32, 128 ) );
+
+	ranges.push_back( Range( 40, 160 ) );
+	ranges.push_back( Range( 40, 160 ) );
+	ranges.push_back( Range( 80, 320 ) );
+	ranges.push_back( Range( 0, 80 ) );
+	ranges.push_back( Range( 160, 640 ) );
+
+	ranges.push_back( Range( 0, 16 ) );
+	ranges.push_back( Range( 8, 32 ) );
+	ranges.push_back( Range( 16, 64 ) );
+	ranges.push_back( Range( 32, 128 ) );
+	ranges.push_back( Range( 64, 256 ) );
+
+	ranges.push_back( Range( 8, 32 ) );
+	ranges.push_back( Range( 8, 32 ) );
+	ranges.push_back( Range( 16, 64 ) );
+	ranges.push_back( Range( 0, 16 ) );
+	ranges.push_back( Range( 32, 128 ) );
+
+
+	ranges.push_back( Range( 0, 8 ) );
+	ranges.push_back( Range( 0, 8 ) );
 
 	int minVal = 0;
 	int maxVal = 0;
-	int totalWays = 1.0f;
 
 	for ( auto& range : ranges )
 	{
 		minVal += range.Min;
 		maxVal += range.Max;
-		totalWays *= 1 + range.Max - range.Min;
 	}
 
-	std::vector<int> ways( 1 + maxVal - minVal );
-	for ( auto& way : ways )
+	auto& convolutionWithFlatOneSignal = []( const std::vector<float>& signal, int flatRange, float flatValue, std::vector<float>& out )
 	{
-		way = 0;
-	}
-
-	std::vector<int> values;
-	for ( auto& range : ranges )
-	{
-		values.push_back( range.Min );
-	}
-
-	bool continueLoop = true;
-	while( continueLoop )
-	{
-		int total = 0;
-		for ( auto& value : values )
+		out.resize( signal.size() + flatRange - 1 );
+		for ( int base_i = 0; base_i < out.size(); ++base_i )
 		{
-			total += value;
+			float sum = 0.0f;
+			for ( int i = std::max( 0, 1 + base_i - flatRange ); i <= base_i; ++i )
+			{
+				if ( i >= 0 && i < signal.size() ) {
+					sum += signal[i];
+				}
+			}
+			out[base_i] = flatValue * sum;
 		}
+	};
 
-		++ways[ total - minVal ];
-
-		for ( int i = 0; i < values.size(); ++i )
-		{
-			++values[i];
-			if ( values[i] > ranges[i].Max )
-			{
-				values[i] = ranges[i].Min;
-			}
-			else
-			{
-				break;
-			}
-
-			if ( i + 1 == values.size() )
-			{
-				continueLoop = false;
-			}
-		}
+	size_t signalLength = 1 + ranges[0].Max - ranges[0].Min;
+	std::vector<float> signal( signalLength, 1.0f / signalLength );
+	for ( int i = 1; i < ranges.size(); ++i )
+	{
+		std::vector<float> result;
+		size_t signalLength = 1 + ranges[i].Max - ranges[i].Min;
+		convolutionWithFlatOneSignal( signal, signalLength, 1.0f / signalLength, result );
+		signal = result;
 	}
+
+	std::vector<float>& ways = signal;
 
 	// Draw background for where the graph is allowed
 	graphicsEngine.DrawRectangle( graphAreaPosition, graphAreaSize );
 
-	int highestWay = 0;
+	float highestWay = 0;
 	for ( auto& way : ways )
 	{
 		if ( way > highestWay )
 		{
 			highestWay = way;
 		}
+	}
+
+	static bool print = true;
+	if ( print )
+	{
+		std::cout << " highestWay=" << highestWay << std::endl;
+		print = false;
 	}
 
 	float barWidth = graphAreaSize.x / ways.size();
