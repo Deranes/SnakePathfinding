@@ -174,44 +174,6 @@ void Game::Draw( GraphicsEngine2D& graphicsEngine ) {
 		Range( int min, int max ) : Min(min), Max(max) {};
 	};
 
-	std::vector<Range> ranges;
-	ranges.push_back( Range( 0, 8 ) );
-	ranges.push_back( Range( 4, 16 ) );
-	ranges.push_back( Range( 8, 32 ) );
-	ranges.push_back( Range( 16, 64 ) );
-	ranges.push_back( Range( 32, 128 ) );
-
-	ranges.push_back( Range( 40, 160 ) );
-	ranges.push_back( Range( 40, 160 ) );
-	ranges.push_back( Range( 80, 320 ) );
-	ranges.push_back( Range( 0, 80 ) );
-	ranges.push_back( Range( 160, 640 ) );
-
-	ranges.push_back( Range( 0, 16 ) );
-	ranges.push_back( Range( 8, 32 ) );
-	ranges.push_back( Range( 16, 64 ) );
-	ranges.push_back( Range( 32, 128 ) );
-	ranges.push_back( Range( 64, 256 ) );
-
-	ranges.push_back( Range( 8, 32 ) );
-	ranges.push_back( Range( 8, 32 ) );
-	ranges.push_back( Range( 16, 64 ) );
-	ranges.push_back( Range( 0, 16 ) );
-	ranges.push_back( Range( 32, 128 ) );
-
-
-	ranges.push_back( Range( 0, 8 ) );
-	ranges.push_back( Range( 0, 8 ) );
-
-	int minVal = 0;
-	int maxVal = 0;
-
-	for ( auto& range : ranges )
-	{
-		minVal += range.Min;
-		maxVal += range.Max;
-	}
-
 	auto& convolutionWithFlatOneSignal = []( const std::vector<float>& signal, int flatRange, float flatValue, std::vector<float>& out )
 	{
 		out.resize( signal.size() + flatRange - 1 );
@@ -228,6 +190,86 @@ void Game::Draw( GraphicsEngine2D& graphicsEngine ) {
 		}
 	};
 
+	auto& Convolution = []( const std::vector<float>& signal_A, const std::vector<float>& signal_B, std::vector<float>& out )
+	{
+		out.resize( signal_A.size() + signal_B.size() - 1 );
+		for ( int k = 0; k < signal_B.size(); ++k )
+		{
+			const float val_B = signal_B[k];
+			for ( int i = 0; i < signal_A.size(); ++i )
+			{
+				out[i+k] += val_B * signal_A[i];
+			}
+		}
+	};
+
+	bool useGranularity = !sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Num1 );
+
+	std::vector<Range> ranges;
+	std::vector<std::vector<float>> signals;
+
+	if ( useGranularity )
+	{
+		ranges.push_back( Range( 0, 4 ) );
+		ranges.push_back( Range( 0, 4 ) );
+		ranges.push_back( Range( 0, 4 ) );
+		ranges.push_back( Range( 0, 4 ) );
+		ranges.push_back( Range( 0, 4 ) );
+		ranges.push_back( Range( 2, 8 ) );
+		ranges.push_back( Range( 2, 8 ) );
+		ranges.push_back( Range( 2, 8 ) );
+		ranges.push_back( Range( 2, 8 ) );
+		ranges.push_back( Range( 2, 8 ) );
+		ranges.push_back( Range( 2, 8 ) );
+		ranges.push_back( Range( 2, 8 ) );
+
+		std::vector<float> signal( 1, 1.0f );
+		for ( int i = 0; i < ranges.size(); ++i )
+		{
+			std::vector<float> result;
+			size_t signalLength = 50;
+			convolutionWithFlatOneSignal( signal, signalLength, 1.0f / signalLength, result );
+			signal = result;
+		}
+
+		bool correctSignal = !sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Num2 );
+
+		if ( correctSignal )
+		{
+			std::vector<float> correctingSignal( ranges.size(), 0.0f );
+			for ( int i = 0; i < signal.size(); ++i )
+			{
+				correctingSignal[(i-1)/49] += signal[i];
+			}
+
+			signals.push_back( std::move( correctingSignal ) );
+		}
+	}
+	else
+	{
+		ranges.push_back( Range( 0, 199 ) );
+		ranges.push_back( Range( 0, 199 ) );
+		ranges.push_back( Range( 0, 199 ) );
+		ranges.push_back( Range( 0, 199 ) );
+		ranges.push_back( Range( 0, 199 ) );
+		ranges.push_back( Range( 100, 399 ) );
+		ranges.push_back( Range( 100, 399 ) );
+		ranges.push_back( Range( 100, 399 ) );
+		ranges.push_back( Range( 100, 399 ) );
+		ranges.push_back( Range( 100, 399 ) );
+		ranges.push_back( Range( 100, 399 ) );
+		ranges.push_back( Range( 100, 399 ) );
+	}
+
+	int minVal = 0;
+	int maxVal = 0;
+
+	for ( auto& range : ranges )
+	{
+		minVal += range.Min;
+		maxVal += range.Max;
+	}
+
 	size_t signalLength = 1 + ranges[0].Max - ranges[0].Min;
 	std::vector<float> signal( signalLength, 1.0f / signalLength );
 	for ( int i = 1; i < ranges.size(); ++i )
@@ -235,6 +277,13 @@ void Game::Draw( GraphicsEngine2D& graphicsEngine ) {
 		std::vector<float> result;
 		size_t signalLength = 1 + ranges[i].Max - ranges[i].Min;
 		convolutionWithFlatOneSignal( signal, signalLength, 1.0f / signalLength, result );
+		signal = result;
+	}
+
+	for ( int i = 0; i < signals.size(); ++i )
+	{
+		std::vector<float> result;
+		Convolution( signal, signals[i], result );
 		signal = result;
 	}
 
